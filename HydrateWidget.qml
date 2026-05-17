@@ -359,7 +359,7 @@ PluginComponent {
 
                     HintItem {
                         icon: "info"
-                        text: "Left-click bar to open dashboard, Right-click to fast log +1."
+                        text: "Right-click the bar icon to quickly log +1 cup."
                     }
 
                 }
