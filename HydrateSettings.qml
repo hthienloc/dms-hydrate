@@ -15,18 +15,6 @@ PluginSettings {
         description: "Configure daily target and distraction-free visual reminders."
     }
 
-    // ALWAYS AT THE TOP
-    SettingsCard {
-        SectionTitle {
-            text: "Usage Guide"
-        }
-
-        UsageGuide {
-            items: ["Left-click the panel icon to toggle the visual progress popout.", "Right-click the panel icon to fast log one water cup (+1).", "Use the popout dashboard to add water cups or reset today's target."]
-        }
-
-    }
-
     SettingsCard {
         SectionTitle {
             text: "General Options"

@@ -92,7 +92,7 @@ PluginComponent {
     }
     // --- Popout Sizing ---
     popoutWidth: 320
-    popoutHeight: root.showHints ? 245 : 205
+    popoutHeight: root.showHints ? 295 : 255
 
     // --- Background Timer (Alarms & Midnight Reset) ---
     Timer {
@@ -122,31 +122,23 @@ PluginComponent {
 
     // --- Horizontal Bar Pill Layout ---
     horizontalBarPill: Component {
-        Item {
-            id: pillContainer
+        Row {
+            spacing: Theme.spacingS
+            anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
-            implicitWidth: contentRow.implicitWidth + Theme.spacingM * 2
-            implicitHeight: parent.widgetThickness
+            DankIcon {
+                name: root.pillIconName
+                size: Theme.iconSizeSmall
+                color: root.pillIconColor
+                anchors.verticalCenter: parent.verticalCenter
+            }
 
-            Row {
-                id: contentRow
-
-                anchors.centerIn: parent
-                spacing: Theme.spacingS
-
-                DankIcon {
-                    name: root.pillIconName
-                    size: Theme.iconSizeSmall
-                    color: root.pillIconColor
-                }
-
-                StyledText {
-                    text: root.cupsLogged + "/" + root.dailyGoal
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                }
-
+            StyledText {
+                text: root.cupsLogged + "/" + root.dailyGoal
+                font.pixelSize: Theme.fontSizeMedium
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+                anchors.verticalCenter: parent.verticalCenter
             }
 
         }
@@ -155,31 +147,23 @@ PluginComponent {
 
     // --- Vertical Bar Pill Layout ---
     verticalBarPill: Component {
-        Item {
-            implicitWidth: parent.widgetThickness
-            implicitHeight: contentColumn.implicitHeight + Theme.spacingM * 2
+        Column {
+            spacing: Theme.spacingS
+            anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
 
-            Column {
-                id: contentColumn
+            DankIcon {
+                name: root.pillIconName
+                size: Theme.iconSizeSmall
+                color: root.pillIconColor
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
 
-                anchors.centerIn: parent
-                spacing: Theme.spacingS
-
-                DankIcon {
-                    name: root.pillIconName
-                    size: Theme.iconSizeSmall
-                    color: root.pillIconColor
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                StyledText {
-                    text: root.cupsLogged + "/" + root.dailyGoal
-                    font.pixelSize: Theme.fontSizeXS
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
+            StyledText {
+                text: root.cupsLogged + "/" + root.dailyGoal
+                font.pixelSize: Theme.fontSizeSmall
+                font.weight: Font.Medium
+                color: Theme.surfaceText
+                anchors.horizontalCenter: parent.horizontalCenter
             }
 
         }
@@ -205,30 +189,30 @@ PluginComponent {
                 // Simple progress cup visual
                 Item {
                     width: parent.width
-                    height: 80
+                    height: 130
 
                     // Clean Cup graphic
                     Rectangle {
                         id: cupFrame
 
-                        width: 60
-                        height: 76
+                        width: 90
+                        height: 120
                         anchors.centerIn: parent
                         color: "transparent"
                         border.color: Theme.surfaceVariantText
-                        border.width: 3
-                        radius: 6
+                        border.width: 4
+                        radius: 10
 
                         // Animated Water Fill
                         Rectangle {
-                            width: parent.width - 6
-                            height: Math.max(0, (parent.height - 6) * Math.min(1, root.cupsLogged / root.dailyGoal))
+                            width: parent.width - 8
+                            height: Math.max(0, (parent.height - 8) * Math.min(1, root.cupsLogged / root.dailyGoal))
                             anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 3
+                            anchors.bottomMargin: 4
                             anchors.horizontalCenter: parent.horizontalCenter
                             color: Theme.primary
                             opacity: 0.75
-                            radius: 4
+                            radius: 6
 
                             Behavior on height {
                                 NumberAnimation {
@@ -242,21 +226,21 @@ PluginComponent {
 
                         // Cup reflection overlay
                         Rectangle {
-                            width: 2
-                            height: parent.height - 10
+                            width: 3
+                            height: parent.height - 16
                             anchors.left: parent.left
-                            anchors.leftMargin: 4
+                            anchors.leftMargin: 6
                             anchors.verticalCenter: parent.verticalCenter
                             color: Theme.surfaceText
                             opacity: 0.12
-                            radius: 1
+                            radius: 1.5
                         }
 
                         // Percentage Label inside the cup
                         StyledText {
                             anchors.centerIn: parent
                             text: Math.round(Math.min(100, (root.cupsLogged / root.dailyGoal) * 100)) + "%"
-                            font.pixelSize: Theme.fontSizeSmall
+                            font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Bold
                             color: Theme.surfaceText
                         }
