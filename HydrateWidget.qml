@@ -12,6 +12,7 @@ PluginComponent {
     // --- Configuration Settings ---
     readonly property int dailyGoal: pluginData.dailyGoal ?? 8
     readonly property int interval: pluginData.interval ?? 60
+    readonly property bool showHints: pluginData.showHints ?? true
     // --- Core State properties ---
     property int cupsLogged: 0
     property string lastLogDate: ""
@@ -79,13 +80,14 @@ PluginComponent {
         }
     }
     // --- Minimalist Interaction Model ---
-    // Left-click increments, Right-click resets. No popout dashboard content.
-    pillClickAction: function() {
+    // Left-click toggles popout dashboard, Right-click increments cups logged.
+    pillClickAction: null
+    onPillRightClicked: {
         root.logCup();
     }
-    onPillRightClicked: {
-        root.resetToday();
-    }
+    // --- Popout Sizing ---
+    popoutWidth: 320
+    popoutHeight: root.showHints ? 245 : 205
 
     // --- Background Timer (Alarms & Midnight Reset) ---
     Timer {
@@ -171,6 +173,124 @@ PluginComponent {
                     font.weight: Font.Medium
                     color: Theme.surfaceText
                     anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+            }
+
+        }
+
+    }
+
+    // --- Popout Content Panel ---
+    popoutContent: Component {
+        PopoutComponent {
+            id: mainContent
+
+            property var parentPopout: null
+
+            onParentPopoutChanged: root.activePopoutReference = parentPopout
+            width: parent ? parent.width : 0
+            headerText: "Hydration Tracker"
+            showCloseButton: true
+
+            Column {
+                width: parent.width
+                spacing: Theme.spacingM
+
+                // Simple progress cup visual
+                Item {
+                    width: parent.width
+                    height: 80
+
+                    // Clean Cup graphic
+                    Rectangle {
+                        id: cupFrame
+
+                        width: 60
+                        height: 76
+                        anchors.centerIn: parent
+                        color: "transparent"
+                        border.color: Theme.surfaceVariantText
+                        border.width: 3
+                        radius: 6
+
+                        // Animated Water Fill
+                        Rectangle {
+                            width: parent.width - 6
+                            height: Math.max(0, (parent.height - 6) * Math.min(1, root.cupsLogged / root.dailyGoal))
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: 3
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: Theme.primary
+                            opacity: 0.75
+                            radius: 4
+
+                            Behavior on height {
+                                NumberAnimation {
+                                    duration: 300
+                                    easing.type: Easing.OutCubic
+                                }
+
+                            }
+
+                        }
+
+                        // Cup reflection overlay
+                        Rectangle {
+                            width: 2
+                            height: parent.height - 10
+                            anchors.left: parent.left
+                            anchors.leftMargin: 4
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: Theme.surfaceText
+                            opacity: 0.12
+                            radius: 1
+                        }
+
+                        // Percentage Label inside the cup
+                        StyledText {
+                            anchors.centerIn: parent
+                            text: Math.round(Math.min(100, (root.cupsLogged / root.dailyGoal) * 100)) + "%"
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Bold
+                            color: Theme.surfaceText
+                        }
+
+                    }
+
+                }
+
+                // Popout Interactive controls (Reset button)
+                Row {
+                    spacing: Theme.spacingS
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    DankButton {
+                        text: "Add Cup (+1)"
+                        backgroundColor: Theme.primary
+                        textColor: Theme.onPrimary
+                        onClicked: logCup()
+                    }
+
+                    DankButton {
+                        text: "Reset Target"
+                        backgroundColor: Theme.surfaceContainerHigh
+                        textColor: Theme.surfaceText
+                        onClicked: resetToday()
+                    }
+
+                }
+
+                // Hint Guide Section
+                HintSection {
+                    width: parent.width
+                    showHints: root.showHints
+
+                    HintItem {
+                        icon: "info"
+                        text: "Left-click bar to open dashboard, Right-click to fast log +1."
+                    }
+
                 }
 
             }

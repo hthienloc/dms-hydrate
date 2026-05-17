@@ -1,6 +1,6 @@
 # DMS Hydrate (Distraction-Free Drink Water Reminder)
 
-`dms-hydrate` is an ultra-minimalist, distraction-free water tracker and reminder widget for **DankMaterialShell**. It strictly adheres to a minimalist philosophy—staying completely away from intrusive popups, modals, sounds, or toast windows, allowing you to use your computer without any distractions.
+`dms-hydrate` is an elegant, distraction-free water tracker and reminder widget for **DankMaterialShell**. It strictly adheres to a minimalist philosophy—staying away from intrusive popups, notification sounds, or active toast alerts, communicating instead through ambient shape shifting on your bar and a clean visual progress dashboard.
 
 ---
 
@@ -22,8 +22,12 @@ All interactions happen directly on the bar pill with simple mouse clicks:
 
 | Action | Gesture |
 |:---|:---|
-| **Increment Cup Count** | **Left-click** the bar pill. Instantly logs `+1` cup and postpones the next alert. |
-| **Reset Today's Target** | **Right-click** the bar pill. Instantly resets logged cups to `0`. |
+| **Toggle Dashboard Popout** | **Left-click** the bar pill. Toggles a clean visual cup progress panel. |
+| **Fast-Increment Cup Count** | **Right-click** the bar pill. Instantly logs `+1` cup and postpones the next alert. |
+
+Inside the dashboard popout, you can also:
+- Click **Add Cup (+1)** to log water intake.
+- Click **Reset Target** to clear today's logged cups back to `0`.
 
 ---
 
@@ -33,6 +37,7 @@ Configure target volumes by navigating to **DMS Settings > Plugins > Hydrate**:
 
 - **Daily Target (Cups)**: The number of daily cups to log, from `1` to `20` (default `8` cups).
 - **Reminder Interval**: The duration in minutes between ambient reminder shape shifts, from `15` to `180` minutes (default `60` minutes).
+- **Show Hints**: Show or hide the interaction gesture guides inside the popout (default `true`).
 
 ---
 

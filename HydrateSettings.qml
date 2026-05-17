@@ -58,6 +58,13 @@ PluginSettings {
                 unit: " mins"
             }
 
+            ToggleSetting {
+                label: "Show Hints"
+                description: "Display helpful mouse gesture guides inside the popout."
+                settingKey: "showHints"
+                defaultValue: true
+            }
+
         }
 
     }
