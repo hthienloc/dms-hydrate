@@ -24,10 +24,10 @@ git clone https://github.com/hthienloc/dms-hydrate ~/.config/DankMaterialShell/p
 
 ## Features
 
-- **Ambient Shifting** - Shape shifts dynamically (`water_drop` ➔ `local_drink` ➔ `check_circle`) to remind you silently
-- **3D Parallax Waves** - Interactive dual-layer water visual with wave animation that freezes and flats out at 100%
-- **Auto-reset** - Automatically resets logged cups when a new calendar day begins
-- **Configurable goals** - Adjust daily cups target, notification interval, and UI hints in DMS Settings
+- **Dehydration & Back Pain Prevention** - Ambient shape-shifting reminders nudge you to stand up, stretch, and drink water to prevent muscle stiffness and back strain from sitting too long
+- **Zero-Distraction Focus** - Operates completely silently directly on your bar with no intrusive notification windows, popups, or sound alerts
+- **At-a-Glance Awareness** - Popout dashboard allows you to monitor your intake progress and daily percentage levels instantly
+- **Frictionless Logging** - Quick-log cups via right-click to instantly record intake and postpone alerts without breaking your active workflow
 
 ## Usage
 
