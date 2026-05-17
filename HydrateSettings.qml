@@ -8,7 +8,7 @@ import qs.Widgets
 PluginSettings {
     id: root
 
-    pluginId: "dmsHydrate"
+    pluginId: "hydrate"
 
     PluginHeader {
         title: "Hydration Tracker Settings"

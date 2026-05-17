@@ -55,6 +55,6 @@ git clone https://github.com/hthienloc/dms-common.git
 
 Stage it locally to your desktop configuration folder:
 ```bash
-cp -r dms-hydrate/ ~/.config/DankMaterialShell/plugins/dmsHydrate
+cp -r dms-hydrate/ ~/.config/DankMaterialShell/plugins/hydrate
 ```
 Scan and enable via DMS settings.
