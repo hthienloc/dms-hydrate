@@ -200,17 +200,95 @@ PluginComponent {
                         border.color: Theme.surfaceVariantText
                         border.width: 4
                         radius: 10
+                        clip: true
 
-                        // Animated Water Fill
-                        Rectangle {
+                        // Animated Wavy Water Level
+                        Item {
+                            id: waterLevelContainer
+
                             width: parent.width - 8
                             height: Math.max(0, (parent.height - 8) * Math.min(1, root.cupsLogged / root.dailyGoal))
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: 4
                             anchors.horizontalCenter: parent.horizontalCenter
-                            color: Theme.primary
-                            opacity: 0.75
-                            radius: 6
+                            clip: true
+
+                            // Background wave (Parallax Back Layer)
+                            Canvas {
+                                id: backWave
+
+                                property real phase: 0
+
+                                anchors.fill: parent
+                                onPhaseChanged: requestPaint()
+                                onPaint: {
+                                    var ctx = getContext("2d");
+                                    ctx.reset();
+                                    var w = width;
+                                    var h = height;
+                                    ctx.fillStyle = Theme.primary;
+                                    ctx.globalAlpha = 0.4;
+                                    ctx.beginPath();
+                                    ctx.moveTo(0, h);
+                                    for (var x = 0; x <= w; x += 2) {
+                                        var y = 5 * Math.sin((x / w) * 2 * Math.PI + phase);
+                                        ctx.lineTo(x, y + 8);
+                                    }
+                                    ctx.lineTo(w, h);
+                                    ctx.lineTo(0, h);
+                                    ctx.closePath();
+                                    ctx.fill();
+                                }
+                            }
+
+                            // Foreground wave (Front Layer)
+                            Canvas {
+                                id: frontWave
+
+                                property real phase: 0
+
+                                anchors.fill: parent
+                                onPhaseChanged: requestPaint()
+                                onPaint: {
+                                    var ctx = getContext("2d");
+                                    ctx.reset();
+                                    var w = width;
+                                    var h = height;
+                                    ctx.fillStyle = Theme.primary;
+                                    ctx.globalAlpha = 0.75;
+                                    ctx.beginPath();
+                                    ctx.moveTo(0, h);
+                                    for (var x = 0; x <= w; x += 2) {
+                                        var y = 5 * Math.sin((x / w) * 2 * Math.PI - phase);
+                                        ctx.lineTo(x, y + 8);
+                                    }
+                                    ctx.lineTo(w, h);
+                                    ctx.lineTo(0, h);
+                                    ctx.closePath();
+                                    ctx.fill();
+                                }
+                            }
+
+                            // Infinite wave animations
+                            NumberAnimation {
+                                target: backWave
+                                property: "phase"
+                                from: 0
+                                to: 2 * Math.PI
+                                duration: 2400
+                                loops: Animation.Infinite
+                                running: root.cupsLogged > 0
+                            }
+
+                            NumberAnimation {
+                                target: frontWave
+                                property: "phase"
+                                from: 0
+                                to: 2 * Math.PI
+                                duration: 1400
+                                loops: Animation.Infinite
+                                running: root.cupsLogged > 0
+                            }
 
                             Behavior on height {
                                 NumberAnimation {
