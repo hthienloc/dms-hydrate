@@ -24,10 +24,10 @@ git clone https://github.com/hthienloc/dms-hydrate ~/.config/DankMaterialShell/p
 
 ## Features
 
-- **Dehydration & Back Pain Prevention** - Ambient shape-shifting reminders nudge you to stand up, stretch, and drink water to prevent muscle stiffness and back strain from sitting too long
-- **Zero-Distraction Focus** - Operates completely silently directly on your bar with no intrusive notification windows, popups, or sound alerts
-- **At-a-Glance Awareness** - Popout dashboard allows you to monitor your intake progress and daily percentage levels instantly
-- **Frictionless Logging** - Quick-log cups via right-click to instantly record intake and postpone alerts without breaking your active workflow
+- **Dehydration Prevention** - Ambient shape-shifting reminders prompt you to maintain daily water intake
+- **Zero-Distraction Focus** - Operates silently on the bar with no intrusive popups or alert sounds
+- **At-a-Glance Tracker** - Popout dashboard to monitor daily progress and target percentage
+- **Frictionless Logging** - Quick-log cups via right-click to instantly record water intake
 
 ## Usage
 
