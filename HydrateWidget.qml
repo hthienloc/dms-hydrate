@@ -33,13 +33,11 @@ PluginComponent {
     }
     readonly property color pillIconColor: {
         if (root.cupsLogged >= root.dailyGoal)
-            return "#4CAF50";
+            return Theme.primary;
 
-        // Clean Success Green
         if (root.needsHydration)
             return Theme.warning;
 
-        // Warm Alert Orange
         return Theme.surfaceText;
     }
 
