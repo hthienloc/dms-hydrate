@@ -24,10 +24,10 @@ git clone https://github.com/hthienloc/dms-hydrate ~/.config/DankMaterialShell/p
 
 ## Features
 
-- **Dehydration Prevention** - Ambient shape-shifting reminders prompt you to maintain daily water intake
-- **Zero-Distraction Focus** - Operates silently on the bar with no intrusive popups or alert sounds
-- **At-a-Glance Tracker** - Popout dashboard to monitor daily progress and target percentage
-- **Frictionless Logging** - Quick-log cups via right-click to instantly record water intake
+- **Water Reminders** - Changes icon on the bar to remind you to drink
+- **Progress Tracker** - Click to see daily progress and logged cups
+- **Quick Log** - Right-click the bar icon to instantly add 1 cup
+- **Easy Config** - Change daily goals and interval in settings
 
 ## Usage
 
