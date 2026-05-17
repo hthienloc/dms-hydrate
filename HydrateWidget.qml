@@ -218,9 +218,11 @@ PluginComponent {
                                 id: backWave
 
                                 property real phase: 0
+                                property int cupsLoggedRef: root.cupsLogged
 
                                 anchors.fill: parent
                                 onPhaseChanged: requestPaint()
+                                onCupsLoggedRefChanged: requestPaint()
                                 onPaint: {
                                     var ctx = getContext("2d");
                                     ctx.reset();
@@ -230,9 +232,10 @@ PluginComponent {
                                     ctx.globalAlpha = 0.4;
                                     ctx.beginPath();
                                     ctx.moveTo(0, h);
+                                    var isFilled = (root.cupsLogged >= root.dailyGoal);
                                     for (var x = 0; x <= w; x += 2) {
-                                        var y = 5 * Math.sin((x / w) * 2 * Math.PI + phase);
-                                        ctx.lineTo(x, y + 8);
+                                        var y = isFilled ? 0 : (5 * Math.sin((x / w) * 2 * Math.PI + phase));
+                                        ctx.lineTo(x, y + (isFilled ? 0 : 8));
                                     }
                                     ctx.lineTo(w, h);
                                     ctx.lineTo(0, h);
@@ -246,9 +249,11 @@ PluginComponent {
                                 id: frontWave
 
                                 property real phase: 0
+                                property int cupsLoggedRef: root.cupsLogged
 
                                 anchors.fill: parent
                                 onPhaseChanged: requestPaint()
+                                onCupsLoggedRefChanged: requestPaint()
                                 onPaint: {
                                     var ctx = getContext("2d");
                                     ctx.reset();
@@ -258,9 +263,10 @@ PluginComponent {
                                     ctx.globalAlpha = 0.75;
                                     ctx.beginPath();
                                     ctx.moveTo(0, h);
+                                    var isFilled = (root.cupsLogged >= root.dailyGoal);
                                     for (var x = 0; x <= w; x += 2) {
-                                        var y = 5 * Math.sin((x / w) * 2 * Math.PI - phase);
-                                        ctx.lineTo(x, y + 8);
+                                        var y = isFilled ? 0 : (5 * Math.sin((x / w) * 2 * Math.PI - phase));
+                                        ctx.lineTo(x, y + (isFilled ? 0 : 8));
                                     }
                                     ctx.lineTo(w, h);
                                     ctx.lineTo(0, h);
@@ -277,7 +283,7 @@ PluginComponent {
                                 to: 2 * Math.PI
                                 duration: 2400
                                 loops: Animation.Infinite
-                                running: root.cupsLogged > 0
+                                running: root.cupsLogged > 0 && root.cupsLogged < root.dailyGoal
                             }
 
                             NumberAnimation {
@@ -287,7 +293,7 @@ PluginComponent {
                                 to: 2 * Math.PI
                                 duration: 1400
                                 loops: Animation.Infinite
-                                running: root.cupsLogged > 0
+                                running: root.cupsLogged > 0 && root.cupsLogged < root.dailyGoal
                             }
 
                             Behavior on height {
