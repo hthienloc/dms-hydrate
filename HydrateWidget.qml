@@ -87,7 +87,7 @@ PluginComponent {
     // --- Minimalist Interaction Model ---
     // Left-click toggles popout dashboard, Right-click increments cups logged.
     pillClickAction: null
-    onPillRightClicked: {
+    pillRightClickAction: () => {
         root.logCup();
     }
     // --- Popout Sizing ---
