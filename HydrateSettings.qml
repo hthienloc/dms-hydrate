@@ -32,44 +32,30 @@ PluginSettings {
             spacing: Theme.spacingM
 
             StyledText {
-                text: "Target & Alerts"
+                text: "Target & Alert Interval"
                 font.pixelSize: Theme.fontSizeMedium
                 font.weight: Font.Medium
                 color: Theme.surfaceText
             }
 
             SliderSetting {
-                label: "Daily Water Target"
-                description: "Set your daily water intake objective in milliliters."
+                label: "Daily Target (Cups)"
+                description: "Set your daily target number of water cups."
                 settingKey: "dailyGoal"
-                defaultValue: 2000
-                minimum: 1000
-                maximum: 4000
-                unit: " ml"
+                defaultValue: 8
+                minimum: 1
+                maximum: 20
+                unit: " cups"
             }
 
             SliderSetting {
                 label: "Reminder Interval"
-                description: "Time between hydration alert notifications."
+                description: "Subtle icon shape shifting interval when hydration is needed."
                 settingKey: "interval"
                 defaultValue: 60
                 minimum: 15
                 maximum: 180
                 unit: " mins"
-            }
-
-            ToggleSetting {
-                label: "Enable Reminders"
-                description: "Send desktop notification alerts when it is time to drink water."
-                settingKey: "enableNotifications"
-                defaultValue: true
-            }
-
-            ToggleSetting {
-                label: "Show Hints"
-                description: "Display helpful mouse gesture guides inside the popout."
-                settingKey: "showHints"
-                defaultValue: true
             }
 
         }

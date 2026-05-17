@@ -1,50 +1,45 @@
-# DMS Hydrate (Drink Water Reminder Widget Plugin)
+# DMS Hydrate (Distraction-Free Drink Water Reminder)
 
-`dms-hydrate` is an elegant, highly interactive hydration tracking and reminder plugin for the **DankMaterialShell** Linux desktop environment. It helps you maintain healthy hydration habits by providing real-time bar widgets, scheduled desktop notifications, and an intuitive tracking visual inside the popout panel.
-
----
-
-## Features
-
-- **💧 Dynamic Bar Pill**: Keeps you updated at a glance with your real-time water count (e.g. `💧 750/2000 ml`). Highlights in clean green when your daily objective is reached.
-- **🥛 Animated Progress Glass**: A visual glass vector in the popout dashboard that dynamically rises and bounces as you log water intake.
-- **📅 Smart Day Auto-Reset**: Remembers your logs and automatically resets your daily water count back to `0 ml` when a new calendar day starts.
-- **⏰ Scheduled Notifications**: Generates system toast notification alerts at customized intervals to remind you to drink. Logging water instantly postpones the next alarm.
-- **⚡ Fast Gestures**: Right-click the bar pill to quick-log `250 ml` of water instantly, without interrupting your flow.
+`dms-hydrate` is an ultra-minimalist, distraction-free water tracker and reminder widget for **DankMaterialShell**. It strictly adheres to a minimalist philosophy—staying completely away from intrusive popups, modals, sounds, or toast windows, allowing you to use your computer without any distractions.
 
 ---
 
-## Usage
+## Minimalist Philosophy & Mechanics
 
-| Gesture / Click | Description |
+Rather than throwing alerts on your screen, `dms-hydrate` communicates ambiently and silently directly on your DankBar:
+
+1. **Ambient Shape Shifting**:
+   - **💧 Water Drop (`water_drop`)**: Neutral state. Blends in naturally with your other panel widgets.
+   - **🥛 Drink Glass (`local_drink` in Amber/Orange)**: Changes shape and color silently when the configured hydration interval passes, acting as a quiet visual prompt.
+   - **✅ Check Circle (`check_circle` in Green)**: Visual indicator when your daily cups target has been met.
+2. **📅 Smart Calendar Day Reset**: Auto-resets your cup count back to `0` when a new calendar day begins.
+
+---
+
+## Quick Gestures
+
+All interactions happen directly on the bar pill with simple mouse clicks:
+
+| Action | Gesture |
 |:---|:---|
-| **Left-Click Pill** | Opens or toggles the Popout hydration tracker dashboard. |
-| **Right-Click Pill** | Instantly quick-logs `+250 ml` and resets the reminder schedule. |
-
-Inside the Popout dashboard, you can:
-1. Log specific standard sizes using the preset buttons: `+250ml` (cup), `+330ml` (glass), and `+500ml` (bottle).
-2. Reset today's intake via the **Reset** button.
+| **Increment Cup Count** | **Left-click** the bar pill. Instantly logs `+1` cup and postpones the next alert. |
+| **Reset Today's Target** | **Right-click** the bar pill. Instantly resets logged cups to `0`. |
 
 ---
 
 ## Settings Configurations
 
-Modify settings by navigating to **DMS Settings > Plugins > Hydrate**:
+Configure target volumes by navigating to **DMS Settings > Plugins > Hydrate**:
 
-- **Daily Water Target**: The daily volume goal in milliliters (ml) from `1000 ml` to `4000 ml` (default `2000 ml`).
-- **Reminder Interval**: The countdown timer length between reminder alarms in minutes from `15` to `180` (default `60` minutes).
-- **Enable Reminders**: Toggle system notifications on or off.
-- **Show Hints**: Show or hide the popout interaction gesture hints.
+- **Daily Target (Cups)**: The number of daily cups to log, from `1` to `20` (default `8` cups).
+- **Reminder Interval**: The duration in minutes between ambient reminder shape shifts, from `15` to `180` minutes (default `60` minutes).
 
 ---
 
-## Installation & Staging
+## Staging & Testing
 
-To stage and test this plugin locally on DankMaterialShell:
-
-1. Clone or copy this directory to your local configuration plugins folder:
-   ```bash
-   cp -r dms-hydrate/ ~/.config/DankMaterialShell/plugins/dmsHydrate
-   ```
-2. Open **DMS Control Center Settings > Plugins > Scan for Plugins**.
-3. Toggle `Hydrate` on and add it to your DankBar configuration layout.
+Stage it locally:
+```bash
+cp -r dms-hydrate/ ~/.config/DankMaterialShell/plugins/dmsHydrate
+```
+Scan and enable via DMS settings.

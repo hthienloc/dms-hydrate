@@ -7,40 +7,55 @@ import qs.Services
 import qs.Widgets
 
 PluginComponent {
-    // Left-click toggles popout using PopoutComponent
-
     id: root
 
     // --- Configuration Settings ---
-    readonly property int dailyGoal: pluginData.dailyGoal ?? 2000
+    readonly property int dailyGoal: pluginData.dailyGoal ?? 8
     readonly property int interval: pluginData.interval ?? 60
-    readonly property bool enableNotifications: pluginData.enableNotifications ?? true
-    readonly property bool showHints: pluginData.showHints ?? true
     // --- Core State properties ---
-    property int waterLogged: 0
+    property int cupsLogged: 0
     property string lastLogDate: ""
     property real lastDrinkTimestamp: 0
+    property bool needsHydration: false
+    // --- Helper properties for dynamic icon shape & color ---
+    readonly property string pillIconName: {
+        if (root.cupsLogged >= root.dailyGoal)
+            return "check_circle";
+
+        if (root.needsHydration)
+            return "local_drink";
+
+        return "water_drop";
+    }
+    readonly property color pillIconColor: {
+        if (root.cupsLogged >= root.dailyGoal)
+            return "#4CAF50";
+ // Clean Success Green
+        if (root.needsHydration)
+            return Theme.warning;
+ // Warm Alert Orange
+        return Theme.surfaceText; // Pure Neutral (Matches bar)
+    }
 
     // --- State Persistence Helpers ---
     function saveState() {
         if (pluginService) {
-            pluginService.savePluginState(pluginId, "waterLogged", root.waterLogged);
+            pluginService.savePluginState(pluginId, "cupsLogged", root.cupsLogged);
             pluginService.savePluginState(pluginId, "lastLogDate", root.lastLogDate);
             pluginService.savePluginState(pluginId, "lastDrinkTimestamp", root.lastDrinkTimestamp);
         }
     }
 
-    function logWater(amount) {
-        root.waterLogged += amount;
+    function logCup() {
+        root.cupsLogged += 1;
+        root.needsHydration = false;
         root.lastDrinkTimestamp = Date.now();
         saveState();
-        if (typeof ToastService !== "undefined" && ToastService)
-            ToastService.showInfo("Added " + amount + " ml! Keep hydrating! 💧");
-
     }
 
     function resetToday() {
-        root.waterLogged = 0;
+        root.cupsLogged = 0;
+        root.needsHydration = false;
         root.lastDrinkTimestamp = Date.now();
         saveState();
     }
@@ -50,27 +65,29 @@ PluginComponent {
         const today = new Date().toDateString();
         const savedDate = pluginService ? pluginService.loadPluginState(pluginId, "lastLogDate", "") : "";
         if (savedDate !== today) {
-            root.waterLogged = 0;
+            root.cupsLogged = 0;
             root.lastLogDate = today;
             root.lastDrinkTimestamp = Date.now();
+            root.needsHydration = false;
             saveState();
         } else {
-            root.waterLogged = pluginService ? pluginService.loadPluginState(pluginId, "waterLogged", 0) : 0;
+            root.cupsLogged = pluginService ? pluginService.loadPluginState(pluginId, "cupsLogged", 0) : 0;
             root.lastLogDate = savedDate;
             root.lastDrinkTimestamp = pluginService ? pluginService.loadPluginState(pluginId, "lastDrinkTimestamp", Date.now()) : Date.now();
+            const elapsed = Date.now() - root.lastDrinkTimestamp;
+            root.needsHydration = (elapsed >= root.interval * 60 * 1000) && (root.cupsLogged < root.dailyGoal);
         }
     }
-    // --- Interaction Gestures ---
-    pillClickAction: null
-    // Right-click quick log standard drink
-    onPillRightClicked: {
-        logWater(250);
+    // --- Minimalist Interaction Model ---
+    // Left-click increments, Right-click resets. No popout dashboard content.
+    pillClickAction: function() {
+        root.logCup();
     }
-    // --- Popout Sizing ---
-    popoutWidth: 320
-    popoutHeight: root.showHints ? 310 : 270
+    onPillRightClicked: {
+        root.resetToday();
+    }
 
-    // --- Background Timer (Alarms, Notifications & Midnight Reset) ---
+    // --- Background Timer (Alarms & Midnight Reset) ---
     Timer {
         interval: 10000 // Check every 10 seconds
         repeat: true
@@ -79,23 +96,19 @@ PluginComponent {
         onTriggered: {
             const today = new Date().toDateString();
             if (root.lastLogDate !== today) {
-                root.waterLogged = 0;
+                root.cupsLogged = 0;
                 root.lastLogDate = today;
                 root.lastDrinkTimestamp = Date.now();
+                root.needsHydration = false;
                 saveState();
                 return ;
             }
-            if (root.enableNotifications) {
-                const now = Date.now();
-                const elapsedMs = now - root.lastDrinkTimestamp;
-                const limitMs = root.interval * 60 * 1000;
-                if (elapsedMs >= limitMs) {
-                    if (typeof ToastService !== "undefined" && ToastService)
-                        ToastService.showInfo("Time to drink water! 💧 You have consumed " + root.waterLogged + " / " + root.dailyGoal + " ml today.");
-
-                    root.lastDrinkTimestamp = now;
-                    saveState();
-                }
+            if (root.cupsLogged < root.dailyGoal) {
+                const elapsed = Date.now() - root.lastDrinkTimestamp;
+                const limit = root.interval * 60 * 1000;
+                root.needsHydration = (elapsed >= limit);
+            } else {
+                root.needsHydration = false;
             }
         }
     }
@@ -115,13 +128,13 @@ PluginComponent {
                 spacing: Theme.spacingS
 
                 DankIcon {
-                    name: "water_drop"
+                    name: root.pillIconName
                     size: Theme.iconSizeSmall
-                    color: root.waterLogged >= root.dailyGoal ? "#4CAF50" : "#2196F3"
+                    color: root.pillIconColor
                 }
 
                 StyledText {
-                    text: root.waterLogged + "/" + root.dailyGoal + " ml"
+                    text: root.cupsLogged + "/" + root.dailyGoal
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.Medium
                     color: Theme.surfaceText
@@ -146,150 +159,18 @@ PluginComponent {
                 spacing: Theme.spacingS
 
                 DankIcon {
-                    name: "water_drop"
+                    name: root.pillIconName
                     size: Theme.iconSizeSmall
-                    color: root.waterLogged >= root.dailyGoal ? "#4CAF50" : "#2196F3"
+                    color: root.pillIconColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 StyledText {
-                    text: root.waterLogged >= 1000 ? (root.waterLogged / 1000).toFixed(1) + "L" : root.waterLogged + "m"
+                    text: root.cupsLogged + "/" + root.dailyGoal
                     font.pixelSize: Theme.fontSizeXS
                     font.weight: Font.Medium
                     color: Theme.surfaceText
                     anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-            }
-
-        }
-
-    }
-
-    // --- Popout Content Panel ---
-    popoutContent: Component {
-        PopoutComponent {
-            id: mainContent
-
-            property var parentPopout: null
-
-            onParentPopoutChanged: root.activePopoutReference = parentPopout
-            width: parent ? parent.width : 0
-            headerText: "Hydration Tracker"
-            showCloseButton: true
-
-            Column {
-                width: parent.width
-                spacing: Theme.spacingM
-
-                // Daily Progress Water Glass visual
-                Item {
-                    width: parent.width
-                    height: 110
-
-                    // Glass container
-                    Rectangle {
-                        id: glassFrame
-
-                        width: 76
-                        height: 106
-                        anchors.centerIn: parent
-                        color: "transparent"
-                        border.color: Theme.surfaceVariantText
-                        border.width: 3
-                        radius: 8
-
-                        // Animated Water Fill
-                        Rectangle {
-                            width: parent.width - 6
-                            height: Math.max(0, (parent.height - 6) * Math.min(1, root.waterLogged / root.dailyGoal))
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 3
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            color: "#2196F3"
-                            opacity: 0.75
-                            radius: 5
-
-                            Behavior on height {
-                                NumberAnimation {
-                                    duration: 400
-                                    easing.type: Easing.OutBack
-                                }
-
-                            }
-
-                        }
-
-                        // Glass reflection overlay
-                        Rectangle {
-                            width: 3
-                            height: parent.height - 12
-                            anchors.left: parent.left
-                            anchors.leftMargin: 6
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: Theme.surfaceText
-                            opacity: 0.15
-                            radius: 1
-                        }
-
-                        // Percentage Label inside the glass
-                        StyledText {
-                            anchors.centerIn: parent
-                            text: Math.round(Math.min(100, (root.waterLogged / root.dailyGoal) * 100)) + "%"
-                            font.pixelSize: Theme.fontSizeSmall
-                            font.weight: Font.Bold
-                            color: Theme.surfaceText
-                        }
-
-                    }
-
-                }
-
-                // Drink Log Quick Presets Row
-                Row {
-                    spacing: Theme.spacingS
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    DankButton {
-                        text: "+250ml"
-                        backgroundColor: Theme.primary
-                        textColor: Theme.onPrimary
-                        onClicked: logWater(250)
-                    }
-
-                    DankButton {
-                        text: "+330ml"
-                        backgroundColor: Theme.primary
-                        textColor: Theme.onPrimary
-                        onClicked: logWater(330)
-                    }
-
-                    DankButton {
-                        text: "+500ml"
-                        backgroundColor: Theme.primary
-                        textColor: Theme.onPrimary
-                        onClicked: logWater(500)
-                    }
-
-                    DankButton {
-                        text: "Reset"
-                        backgroundColor: Theme.surfaceContainerHigh
-                        textColor: Theme.surfaceText
-                        onClicked: resetToday()
-                    }
-
-                }
-
-                // Hint Guide Section
-                HintSection {
-                    width: parent.width
-                    showHints: root.showHints
-
-                    HintItem {
-                        icon: "info"
-                        text: "Left-click bar to open, Right-click to quick log 250ml."
-                    }
-
                 }
 
             }
