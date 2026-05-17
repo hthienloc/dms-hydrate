@@ -1,3 +1,4 @@
+import "../dms-common"
 import QtQuick
 import QtQuick.Controls
 import Quickshell
@@ -7,6 +8,8 @@ import qs.Services
 import qs.Widgets
 
 PluginComponent {
+    // Pure Neutral (Matches bar)
+
     id: root
 
     // --- Configuration Settings ---
@@ -31,11 +34,13 @@ PluginComponent {
     readonly property color pillIconColor: {
         if (root.cupsLogged >= root.dailyGoal)
             return "#4CAF50";
- // Clean Success Green
+
+        // Clean Success Green
         if (root.needsHydration)
             return Theme.warning;
- // Warm Alert Orange
-        return Theme.surfaceText; // Pure Neutral (Matches bar)
+
+        // Warm Alert Orange
+        return Theme.surfaceText;
     }
 
     // --- State Persistence Helpers ---

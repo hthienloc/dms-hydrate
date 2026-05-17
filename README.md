@@ -41,9 +41,19 @@ Configure target volumes by navigating to **DMS Settings > Plugins > Hydrate**:
 
 ---
 
+## Installation
+
+This plugin depends on `dms-common` for standard DMS layout components and cards. Ensure `dms-common` is cloned in the parent directory next to `dms-hydrate`:
+
+```bash
+git clone https://github.com/hthienloc/dms-common.git
+```
+
+---
+
 ## Staging & Testing
 
-Stage it locally:
+Stage it locally to your desktop configuration folder:
 ```bash
 cp -r dms-hydrate/ ~/.config/DankMaterialShell/plugins/dmsHydrate
 ```
