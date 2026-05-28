@@ -1,4 +1,4 @@
-import "../dms-common"
+import "./dms-common"
 import QtQuick
 import QtQuick.Controls
 import Quickshell

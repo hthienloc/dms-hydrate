@@ -1,4 +1,4 @@
-import "../dms-common"
+import "./dms-common"
 import QtQuick
 import QtQuick.Controls
 import qs.Common
@@ -10,14 +10,10 @@ PluginSettings {
 
     pluginId: "hydrate"
 
-    PluginHeader {
-        title: "Hydration Tracker Settings"
-        description: "Configure daily target and distraction-free visual reminders."
-    }
-
     SettingsCard {
         SectionTitle {
             text: "General Options"
+            icon: "water_drop"
         }
 
         SliderSetting {
@@ -47,6 +43,10 @@ PluginSettings {
             defaultValue: true
         }
 
+    }
+
+    FeedbackCard {
+        repoUrl: "https://github.com/hthienloc/dms-hydrate"
     }
 
 }
