@@ -337,14 +337,14 @@ PluginComponent {
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     DankButton {
-                        text: "Add Cup (+1)"
+                        text: I18n.tr("Add Cup (+1)")
                         backgroundColor: Theme.primary
                         textColor: Theme.onPrimary
                         onClicked: logCup()
                     }
 
                     DankButton {
-                        text: "Reset Target"
+                        text: I18n.tr("Reset Target")
                         backgroundColor: Theme.surfaceContainerHigh
                         textColor: Theme.surfaceText
                         onClicked: resetToday()
@@ -359,7 +359,7 @@ PluginComponent {
 
                     HintItem {
                         icon: "info"
-                        text: "Right-click the bar icon to quickly log +1 cup."
+                        text: I18n.tr("Right-click the bar icon to quickly log +1 cup.")
                     }
 
                 }

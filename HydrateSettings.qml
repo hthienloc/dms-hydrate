@@ -12,40 +12,40 @@ PluginSettings {
 
     SettingsCard {
         SectionTitle {
-            text: "General Options"
+            text: I18n.tr("General Options")
             icon: "water_drop"
         }
 
         SliderSetting {
-            label: "Daily Target (Cups)"
-            description: "Set your daily target number of water cups."
+            label: I18n.tr("Daily Target (Cups)")
+            description: I18n.tr("Set your daily target number of water cups.")
             settingKey: "dailyGoal"
             defaultValue: 8
             minimum: 1
             maximum: 20
-            unit: " cups"
+            unit: I18n.tr(" cups")
         }
 
         SliderSetting {
-            label: "Reminder Interval"
-            description: "Subtle icon shape shifting interval when hydration is needed."
+            label: I18n.tr("Reminder Interval")
+            description: I18n.tr("Subtle icon shape shifting interval when hydration is needed.")
             settingKey: "interval"
             defaultValue: 60
             minimum: 15
             maximum: 180
-            unit: " mins"
+            unit: I18n.tr(" mins")
         }
 
         ToggleSetting {
-            label: "Show Hints"
-            description: "Display helpful mouse gesture guides inside the popout."
+            label: I18n.tr("Show Hints")
+            description: I18n.tr("Display helpful mouse gesture guides inside the popout.")
             settingKey: "showHints"
             defaultValue: true
         }
 
     }
 
-    FeedbackCard {
+    PluginAbout {
         repoUrl: "https://github.com/hthienloc/dms-hydrate"
     }
 
