@@ -11,38 +11,82 @@ PluginSettings {
     pluginId: "hydrate"
 
     SettingsCard {
+        id: goalSection
         SectionTitle {
-            text: I18n.tr("General Options")
+            text: I18n.tr("Hydration Goals")
             icon: "water_drop"
+            showReset: dailyGoal.isDirty || interval.isDirty
+            onResetClicked: {
+                dailyGoal.resetToDefault();
+                interval.resetToDefault();
+            }
         }
 
-        SliderSetting {
-            label: I18n.tr("Daily Target (Cups)")
-            description: I18n.tr("Set your daily target number of water cups.")
+        SliderSettingPlus {
+            id: dailyGoal
+            label: I18n.tr("Daily Target")
+            description: I18n.tr("Target number of cups per day.")
             settingKey: "dailyGoal"
             defaultValue: 8
             minimum: 1
             maximum: 20
             unit: I18n.tr(" cups")
+            leftLabel: "1"
+            rightLabel: "20"
         }
 
-        SliderSetting {
+        Separator {}
+
+        SliderSettingPlus {
+            id: interval
             label: I18n.tr("Reminder Interval")
-            description: I18n.tr("Subtle icon shape shifting interval when hydration is needed.")
+            description: I18n.tr("How often the icon shifts to remind you to drink.")
             settingKey: "interval"
             defaultValue: 60
             minimum: 15
             maximum: 180
-            unit: I18n.tr(" mins")
+            unit: I18n.tr(" min")
+            leftLabel: "15"
+            rightLabel: "180"
+        }
+    }
+
+    SettingsCard {
+        id: behaviorSection
+        SectionTitle {
+            text: I18n.tr("Behavior")
+            icon: "settings"
+            showReset: showHints.isDirty
+            onResetClicked: {
+                showHints.resetToDefault();
+            }
         }
 
-        ToggleSetting {
+        ToggleSettingPlus {
+            id: showHints
             label: I18n.tr("Show Hints")
-            description: I18n.tr("Display helpful mouse gesture guides inside the popout.")
             settingKey: "showHints"
             defaultValue: true
         }
+    }
 
+    SettingsCard {
+        SectionTitle { 
+            id: usageTitle
+            text: I18n.tr("Usage Guide")
+            icon: "menu_book" 
+            collapsible: true
+            settingKey: "usageGuideExpanded"
+        }
+
+        UsageGuide {
+            expanded: usageTitle.isExpanded
+            items: [
+                I18n.tr("<b>Left-click</b> the pill to open the hydration dashboard."),
+                I18n.tr("<b>Right-click</b> the pill to instantly log <b>+1 cup</b>."),
+                I18n.tr("The icon will <b>pulse or shift shape</b> when it's time to drink.")
+            ]
+        }
     }
 
     PluginAbout {
