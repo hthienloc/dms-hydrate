@@ -13,17 +13,21 @@ PluginComponent {
     id: root
 
     // --- Configuration Settings ---
-    readonly property int dailyGoal: pluginData.dailyGoal ?? 8
+    readonly property int dailyGoal: {
+        let val = pluginData.dailyGoal ?? 2000;
+        if (val < 50) return val * 250; // Auto-migrate cups target to ml
+        return val;
+    }
     readonly property int interval: pluginData.interval ?? 60
     readonly property bool showHints: pluginData.showHints ?? true
     // --- Core State properties ---
-    property int cupsLogged: 0
+    property int mlLogged: 0
     property string lastLogDate: ""
     property real lastDrinkTimestamp: 0
     property bool needsHydration: false
     // --- Helper properties for dynamic icon shape & color ---
     readonly property string pillIconName: {
-        if (root.cupsLogged >= root.dailyGoal)
+        if (root.mlLogged >= root.dailyGoal)
             return "check_circle";
 
         if (root.needsHydration)
@@ -32,7 +36,7 @@ PluginComponent {
         return "water_drop";
     }
     readonly property color pillIconColor: {
-        if (root.cupsLogged >= root.dailyGoal)
+        if (root.mlLogged >= root.dailyGoal)
             return Theme.primary;
 
         if (root.needsHydration)
@@ -44,21 +48,21 @@ PluginComponent {
     // --- State Persistence Helpers ---
     function saveState() {
         if (pluginService) {
-            pluginService.savePluginState(pluginId, "cupsLogged", root.cupsLogged);
+            pluginService.savePluginState(pluginId, "mlLogged", root.mlLogged);
             pluginService.savePluginState(pluginId, "lastLogDate", root.lastLogDate);
             pluginService.savePluginState(pluginId, "lastDrinkTimestamp", root.lastDrinkTimestamp);
         }
     }
 
-    function logCup() {
-        root.cupsLogged += 1;
+    function logWater(amount) {
+        root.mlLogged += amount;
         root.needsHydration = false;
         root.lastDrinkTimestamp = Date.now();
         saveState();
     }
 
     function resetToday() {
-        root.cupsLogged = 0;
+        root.mlLogged = 0;
         root.needsHydration = false;
         root.lastDrinkTimestamp = Date.now();
         saveState();
@@ -69,28 +73,38 @@ PluginComponent {
         const today = new Date().toDateString();
         const savedDate = pluginService ? pluginService.loadPluginState(pluginId, "lastLogDate", "") : "";
         if (savedDate !== today) {
-            root.cupsLogged = 0;
+            root.mlLogged = 0;
             root.lastLogDate = today;
             root.lastDrinkTimestamp = Date.now();
             root.needsHydration = false;
             saveState();
         } else {
-            root.cupsLogged = pluginService ? pluginService.loadPluginState(pluginId, "cupsLogged", 0) : 0;
             root.lastLogDate = savedDate;
             root.lastDrinkTimestamp = pluginService ? pluginService.loadPluginState(pluginId, "lastDrinkTimestamp", Date.now()) : Date.now();
+            
+            // Check for saved mlLogged
+            let savedMl = pluginService ? pluginService.loadPluginState(pluginId, "mlLogged", -1) : -1;
+            if (savedMl === -1) {
+                // Migrate from old cupsLogged database
+                let savedCups = pluginService ? pluginService.loadPluginState(pluginId, "cupsLogged", 0) : 0;
+                root.mlLogged = savedCups * 250;
+            } else {
+                root.mlLogged = savedMl;
+            }
+            
             const elapsed = Date.now() - root.lastDrinkTimestamp;
-            root.needsHydration = (elapsed >= root.interval * 60 * 1000) && (root.cupsLogged < root.dailyGoal);
+            root.needsHydration = (elapsed >= root.interval * 60 * 1000) && (root.mlLogged < root.dailyGoal);
         }
     }
     // --- Minimalist Interaction Model ---
-    // Left-click toggles popout dashboard, Right-click increments cups logged.
+    // Left-click toggles popout dashboard, Right-click fast increments by 250ml.
     pillClickAction: null
     pillRightClickAction: () => {
-        root.logCup();
+        root.logWater(250);
     }
     // --- Popout Sizing ---
     popoutWidth: 320
-    popoutHeight: root.showHints ? 295 : 255
+    popoutHeight: root.showHints ? 335 : 295
 
     // --- Background Timer (Alarms & Midnight Reset) ---
     Timer {
@@ -101,14 +115,14 @@ PluginComponent {
         onTriggered: {
             const today = new Date().toDateString();
             if (root.lastLogDate !== today) {
-                root.cupsLogged = 0;
+                root.mlLogged = 0;
                 root.lastLogDate = today;
                 root.lastDrinkTimestamp = Date.now();
                 root.needsHydration = false;
                 saveState();
                 return ;
             }
-            if (root.cupsLogged < root.dailyGoal) {
+            if (root.mlLogged < root.dailyGoal) {
                 const elapsed = Date.now() - root.lastDrinkTimestamp;
                 const limit = root.interval * 60 * 1000;
                 root.needsHydration = (elapsed >= limit);
@@ -132,15 +146,13 @@ PluginComponent {
             }
 
             StyledText {
-                text: root.cupsLogged + "/" + root.dailyGoal
+                text: root.mlLogged + "/" + root.dailyGoal + "ml"
                 font.pixelSize: Theme.fontSizeMedium
                 font.weight: Font.Medium
                 color: Theme.surfaceText
                 anchors.verticalCenter: parent.verticalCenter
             }
-
         }
-
     }
 
     // --- Vertical Bar Pill Layout ---
@@ -157,15 +169,13 @@ PluginComponent {
             }
 
             StyledText {
-                text: root.cupsLogged + "/" + root.dailyGoal
+                text: root.mlLogged + "ml"
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
                 color: Theme.surfaceText
                 anchors.horizontalCenter: parent.horizontalCenter
             }
-
         }
-
     }
 
     // --- Popout Content Panel ---
@@ -207,7 +217,7 @@ PluginComponent {
                             id: waterLevelContainer
 
                             width: parent.width - 8
-                            height: Math.max(0, (parent.height - 8) * Math.min(1, root.cupsLogged / root.dailyGoal))
+                            height: Math.max(0, (parent.height - 8) * Math.min(1, root.mlLogged / root.dailyGoal))
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: 4
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -218,11 +228,11 @@ PluginComponent {
                                 id: backWave
 
                                 property real phase: 0
-                                property int cupsLoggedRef: root.cupsLogged
+                                property int mlLoggedRef: root.mlLogged
 
                                 anchors.fill: parent
                                 onPhaseChanged: requestPaint()
-                                onCupsLoggedRefChanged: requestPaint()
+                                onMlLoggedRefChanged: requestPaint()
                                 onPaint: {
                                     var ctx = getContext("2d");
                                     ctx.reset();
@@ -232,7 +242,7 @@ PluginComponent {
                                     ctx.globalAlpha = 0.4;
                                     ctx.beginPath();
                                     ctx.moveTo(0, h);
-                                    var isFilled = (root.cupsLogged >= root.dailyGoal);
+                                    var isFilled = (root.mlLogged >= root.dailyGoal);
                                     for (var x = 0; x <= w; x += 2) {
                                         var y = isFilled ? 0 : (5 * Math.sin((x / w) * 2 * Math.PI + phase));
                                         ctx.lineTo(x, y + (isFilled ? 0 : 8));
@@ -249,11 +259,11 @@ PluginComponent {
                                 id: frontWave
 
                                 property real phase: 0
-                                property int cupsLoggedRef: root.cupsLogged
+                                property int mlLoggedRef: root.mlLogged
 
                                 anchors.fill: parent
                                 onPhaseChanged: requestPaint()
-                                onCupsLoggedRefChanged: requestPaint()
+                                onMlLoggedRefChanged: requestPaint()
                                 onPaint: {
                                     var ctx = getContext("2d");
                                     ctx.reset();
@@ -263,7 +273,7 @@ PluginComponent {
                                     ctx.globalAlpha = 0.75;
                                     ctx.beginPath();
                                     ctx.moveTo(0, h);
-                                    var isFilled = (root.cupsLogged >= root.dailyGoal);
+                                    var isFilled = (root.mlLogged >= root.dailyGoal);
                                     for (var x = 0; x <= w; x += 2) {
                                         var y = isFilled ? 0 : (5 * Math.sin((x / w) * 2 * Math.PI - phase));
                                         ctx.lineTo(x, y + (isFilled ? 0 : 8));
@@ -283,7 +293,7 @@ PluginComponent {
                                 to: 2 * Math.PI
                                 duration: 2400
                                 loops: Animation.Infinite
-                                running: root.cupsLogged > 0 && root.cupsLogged < root.dailyGoal
+                                running: root.mlLogged > 0 && root.mlLogged < root.dailyGoal
                             }
 
                             NumberAnimation {
@@ -293,7 +303,7 @@ PluginComponent {
                                 to: 2 * Math.PI
                                 duration: 1400
                                 loops: Animation.Infinite
-                                running: root.cupsLogged > 0 && root.cupsLogged < root.dailyGoal
+                                running: root.mlLogged > 0 && root.mlLogged < root.dailyGoal
                             }
 
                             Behavior on height {
@@ -301,9 +311,7 @@ PluginComponent {
                                     duration: 300
                                     easing.type: Easing.OutCubic
                                 }
-
                             }
-
                         }
 
                         // Cup reflection overlay
@@ -321,35 +329,55 @@ PluginComponent {
                         // Percentage Label inside the cup
                         StyledText {
                             anchors.centerIn: parent
-                            text: Math.round(Math.min(100, (root.cupsLogged / root.dailyGoal) * 100)) + "%"
+                            text: Math.round(Math.min(100, (root.mlLogged / root.dailyGoal) * 100)) + "%"
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Bold
                             color: Theme.surfaceText
                         }
-
                     }
-
                 }
 
-                // Popout Interactive controls (Reset button)
+                // Presets Container Row
                 Row {
+                    width: parent.width
                     spacing: Theme.spacingS
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     DankButton {
-                        text: I18n.tr("Add Cup (+1)")
-                        backgroundColor: Theme.primary
-                        textColor: Theme.onPrimary
-                        onClicked: logCup()
+                        width: (parent.width - Theme.spacingS * 2) / 3
+                        iconName: "local_bar"
+                        text: "250ml"
+                        backgroundColor: Theme.surfaceContainerHigh
+                        textColor: Theme.primary
+                        onClicked: logWater(250)
                     }
 
                     DankButton {
-                        text: I18n.tr("Reset Target")
+                        width: (parent.width - Theme.spacingS * 2) / 3
+                        iconName: "local_cafe"
+                        text: "350ml"
                         backgroundColor: Theme.surfaceContainerHigh
-                        textColor: Theme.surfaceText
-                        onClicked: resetToday()
+                        textColor: Theme.primary
+                        onClicked: logWater(350)
                     }
 
+                    DankButton {
+                        width: (parent.width - Theme.spacingS * 2) / 3
+                        iconName: "local_drink"
+                        text: "500ml"
+                        backgroundColor: Theme.surfaceContainerHigh
+                        textColor: Theme.primary
+                        onClicked: logWater(500)
+                    }
+                }
+
+                // Reset progress button
+                DankButton {
+                    width: parent.width
+                    text: I18n.tr("Reset Progress")
+                    backgroundColor: Theme.surfaceContainerHighest
+                    textColor: Theme.surfaceText
+                    onClicked: resetToday()
                 }
 
                 // Hint Guide Section
@@ -359,15 +387,10 @@ PluginComponent {
 
                     HintItem {
                         icon: "info"
-                        text: I18n.tr("Right-click the bar icon to quickly log +1 cup.")
+                        text: I18n.tr("Right-click the bar icon to quickly log +250ml.")
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

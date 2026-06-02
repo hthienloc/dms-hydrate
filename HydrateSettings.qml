@@ -25,14 +25,14 @@ PluginSettings {
         SliderSettingPlus {
             id: dailyGoal
             label: I18n.tr("Daily Target")
-            description: I18n.tr("Target number of cups per day.")
+            description: I18n.tr("Target water intake per day.")
             settingKey: "dailyGoal"
-            defaultValue: 8
-            minimum: 1
-            maximum: 20
-            unit: I18n.tr(" cups")
-            leftLabel: "1"
-            rightLabel: "20"
+            defaultValue: 2000
+            minimum: 500
+            maximum: 5000
+            unit: I18n.tr(" ml")
+            leftLabel: "500"
+            rightLabel: "5000"
         }
 
         Separator {}
@@ -62,11 +62,32 @@ PluginSettings {
             }
         }
 
-        ToggleSettingPlus {
-            id: showHints
-            label: I18n.tr("Show Hints")
-            settingKey: "showHints"
-            defaultValue: true
+        Item {
+            width: parent.width
+            height: showHints.height
+
+            HoverHandler {
+                id: showHintsHover
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.leftMargin: -12
+                anchors.rightMargin: -12
+                anchors.topMargin: -6
+                anchors.bottomMargin: -6
+                radius: Theme.cornerRadius
+                color: showHintsHover.hovered ? Theme.withAlpha(Theme.primary, 0.08) : "transparent"
+                Behavior on color { ColorAnimation { duration: 150 } }
+            }
+
+            ToggleSettingPlus {
+                id: showHints
+                width: parent.width
+                label: I18n.tr("Show Hints")
+                settingKey: "showHints"
+                defaultValue: true
+            }
         }
     }
 
