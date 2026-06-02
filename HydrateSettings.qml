@@ -62,32 +62,11 @@ PluginSettings {
             }
         }
 
-        Item {
-            width: parent.width
-            height: showHints.height
-
-            HoverHandler {
-                id: showHintsHover
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.leftMargin: -12
-                anchors.rightMargin: -12
-                anchors.topMargin: -6
-                anchors.bottomMargin: -6
-                radius: Theme.cornerRadius
-                color: showHintsHover.hovered ? Theme.withAlpha(Theme.primary, 0.08) : "transparent"
-                Behavior on color { ColorAnimation { duration: 150 } }
-            }
-
-            ToggleSettingPlus {
-                id: showHints
-                width: parent.width
-                label: I18n.tr("Show Hints")
-                settingKey: "showHints"
-                defaultValue: true
-            }
+        ToggleSettingPlus {
+            id: showHints
+            label: I18n.tr("Show Hints")
+            settingKey: "showHints"
+            defaultValue: true
         }
     }
 
