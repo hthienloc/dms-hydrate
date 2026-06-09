@@ -56,11 +56,30 @@ PluginSettings {
         SectionTitle {
             text: I18n.tr("Behavior")
             icon: "settings"
-            showReset: showHints.isDirty
+            showReset: showHints.isDirty || displayMode.isDirty
             onResetClicked: {
                 showHints.resetToDefault();
+                displayMode.resetToDefault();
             }
         }
+
+        SelectionSettingPlus {
+            id: displayMode
+            label: I18n.tr("Display Mode")
+            description: I18n.tr("How progress is shown on the bar.")
+            settingKey: "displayMode"
+            defaultValue: "full"
+            options: [
+                { label: I18n.tr("Full (Logged / Goal)"), value: "full" },
+                { label: I18n.tr("Logged Only"), value: "logged" },
+                { label: I18n.tr("Percentage"), value: "percentage" },
+                { label: I18n.tr("Icon Only"), value: "icon" },
+                { label: I18n.tr("Progress Bar"), value: "progress" },
+                { label: I18n.tr("Text + Bar"), value: "text_progress" }
+            ]
+        }
+
+        Separator {}
 
         ToggleSettingPlus {
             id: showHints

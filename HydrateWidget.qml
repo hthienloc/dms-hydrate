@@ -19,6 +19,7 @@ PluginComponent {
         return val;
     }
     readonly property int interval: pluginData.interval ?? 60
+    readonly property string displayMode: pluginData.displayMode ?? "full"
     readonly property bool showHints: pluginData.showHints ?? true
     // --- Core State properties ---
     property int mlLogged: 0
@@ -26,6 +27,24 @@ PluginComponent {
     property real lastDrinkTimestamp: 0
     property bool needsHydration: false
     // --- Helper properties for dynamic icon shape & color ---
+    readonly property real progress: Math.min(1, root.mlLogged / root.dailyGoal)
+    readonly property bool showProgressBar: root.displayMode === "progress" || root.displayMode === "text_progress"
+
+    readonly property string pillText: {
+        switch (root.displayMode) {
+            case "logged":
+            case "text_progress":
+                return root.mlLogged + "ml";
+            case "percentage":
+                return Math.round(Math.min(100, root.progress * 100)) + "%";
+            case "full":
+                return root.mlLogged + "/" + root.dailyGoal + "ml";
+            case "icon":
+            case "progress":
+            default:
+                return "";
+        }
+    }
     readonly property string pillIconName: {
         if (root.mlLogged >= root.dailyGoal)
             return "check_circle";
@@ -135,7 +154,7 @@ PluginComponent {
     // --- Horizontal Bar Pill Layout ---
     horizontalBarPill: Component {
         Row {
-            spacing: Theme.spacingS
+            spacing: (root.pillText !== "" || root.showProgressBar) ? Theme.spacingS : 0
             anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
             DankIcon {
@@ -146,11 +165,29 @@ PluginComponent {
             }
 
             StyledText {
-                text: root.mlLogged + "/" + root.dailyGoal + "ml"
+                visible: root.pillText !== ""
+                text: root.pillText
                 font.pixelSize: Theme.fontSizeMedium
                 font.weight: Font.Medium
                 color: Theme.surfaceText
                 anchors.verticalCenter: parent.verticalCenter
+            }
+
+            // Progress Bar (Horizontal)
+            StyledRect {
+                visible: root.showProgressBar
+                width: 60
+                height: 6
+                radius: 3
+                color: Theme.surfaceContainerHighest
+                anchors.verticalCenter: parent.verticalCenter
+
+                Rectangle {
+                    width: Math.max(height, parent.width * root.progress)
+                    height: parent.height
+                    radius: parent.radius
+                    color: Theme.primary
+                }
             }
         }
     }
@@ -158,7 +195,7 @@ PluginComponent {
     // --- Vertical Bar Pill Layout ---
     verticalBarPill: Component {
         Column {
-            spacing: Theme.spacingS
+            spacing: (root.pillText !== "" || root.showProgressBar) ? Theme.spacingS : 0
             anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
 
             DankIcon {
@@ -169,11 +206,30 @@ PluginComponent {
             }
 
             StyledText {
-                text: root.mlLogged + "ml"
+                visible: root.pillText !== ""
+                text: root.displayMode === "full" ? root.mlLogged + "ml" : root.pillText
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
                 color: Theme.surfaceText
                 anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            // Progress Bar (Vertical)
+            StyledRect {
+                visible: root.showProgressBar
+                width: 6
+                height: 40
+                radius: 3
+                color: Theme.surfaceContainerHighest
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                Rectangle {
+                    width: parent.width
+                    height: Math.max(width, parent.height * root.progress)
+                    radius: parent.radius
+                    color: Theme.primary
+                    anchors.bottom: parent.bottom
+                }
             }
         }
     }
